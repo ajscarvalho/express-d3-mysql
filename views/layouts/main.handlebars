@@ -13,6 +13,15 @@
 </header>
 {{{body}}}
 </body>
-<script type="text/javascript" src=/js/d3.min.js">
-<script type="text/javascript" src=/js/main.js">
+<script type="text/javascript" src="/js/d3.min.js"></script>
+<!-- network -->
+<script type="text/javascript" src="/js/http_request.js"></script>
+<script type="text/javascript" src="/js/chart_request.js"></script>
+
+<script type="text/javascript" src="/js/main.js"></script>
+
+{{#if additionalScript}}
+    <script type="text/javascript" src="/js/{{additionalScript}}.js"></script>
+{{/if}}
+
 </html>
