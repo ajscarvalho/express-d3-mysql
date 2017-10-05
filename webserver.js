@@ -6,13 +6,9 @@ const express = require('express')
 const exphbs  = require('express-handlebars');
 const mysqlDB = require('./mysql_db')
 
-const app = express();
-const hbs =  exphbs.create({
-    // define helper functions
-});
-
 const config = require('./config');
-const conn = mysqlDB.get_db_connection(config.mysql);
+
+let conn = null; // db connection (as a global, can also create singleton or use dependency injection)
 
 // TODO Error Handlers???
 
@@ -28,11 +24,8 @@ function safeHandler(handler) {
 }
 
 function validate_file(filename){
-    console.log('original', filename);
     filename = filename.replace(/[^\w.-]/, ''); // allows numbers and letters . - _
-    console.log('only allowed', filename);
     filename = filename.replace(/^([._-]+)/, ''); // must start with number or letter
-    console.log('only allowed first', filename);
     return filename
 }
 
@@ -46,30 +39,42 @@ function sendStaticFileForPath(path) {
 };
 
 
-app.engine('handlebars', hbs.engine);
-app.set('view engine', 'handlebars');
-
-
-// Page Handlers
-app.get('/', function(req, res){
-    res.render('home', {'layout': 'main'});
-});
-
-
 // API Handlers
 
 
-var get_chart_data = function(req, res){
+var get_chart_data = async function(req, res){
     let start = req.query.start;
     let end   = req.query.end;
     let seriesNames = req.query.sources.split(',');
-    let seriesIds = mysqlDB.select_series_by_names(conn, seriesNames);
-    console.log('seriesIds', seriesIds);
+//console.log('get_chart_data', start, end, seriesNames);
 
-    let points  = mysqlDB.select_points(conn, seriesIds, start, end);
-    console.log('points', points);
+    let series = await mysqlDB.select_series_by_names(conn, seriesNames);
+//console.log('series', series);
 
-    return res.json(points);
+    let seriesDict = {};
+    for (let s of series) seriesDict[s.id] = s.series_name;
+//console.log('seriesDict', seriesDict);
+
+    let seriesIds = series.map( (x) => x.id);
+//console.log('series ids', seriesIds);
+    
+    let points  = await mysqlDB.select_points(conn, seriesIds, start, end);
+//console.log('points', points.length, 'example', points[0]);
+
+//console.log("typeof", typeof points[0].ts, points[0].ts, typeof points[0].ts.toString())
+
+    let xLegend = [];
+    for (let p of points) {
+        let ts = p.ts.toString(); // or other format for date (if this is indeed a date object...)
+        let xpos = xLegend.indexOf(ts)
+        if (xpos == -1) {
+            xpos = xLegend.length;
+            xLegend.push(ts);
+        } 
+        p.x = xpos;
+    }
+
+    return res.json({points: points, seriesLegend: seriesDict, xLegend: xLegend});
 };
 
 
@@ -85,7 +90,7 @@ var get_static_data = function(req, res){
 
     for (let a = 0; a < seriesNames.length; a++) {
         let seriesId = a + 10;
-        currentTS = initialTS;
+        currentTS = initialTS;  
         while(currentTS <= endTS) {
             data.push([seriesId, currentTS, Math.random()]);
             currentTS = Date(currentTS.getTime() + deltaTS);
@@ -98,18 +103,41 @@ var get_static_data = function(req, res){
     //res.send('start=' + req.query.start + "<br />" + 'end=' + req.query.end + "<br />Sources: " + req.query.sources);
 };
 
-// [[series, x, y], ]
-app.get('/api/chart', get_chart_data); //get_static_data);
+
+
+async function main()
+{
+    conn = await mysqlDB.get_db_connection(config.mysql);
+
+    const app = express();
+    const hbs =  exphbs.create({ // express handlebars rendering engine initialization
+        // define helper functions here
+        // fncX: function(a, b){ return a + b; }
+    });
+
+    // configure application rendering engine
+    app.engine('handlebars', hbs.engine);
+    app.set('view engine', 'handlebars');
+
+    // Page Handlers
+    app.get('/', function(req, res){
+        res.render('home', {'layout': 'main'});
+    });
+
+    // [[series, x, y], ]
+    app.get('/api/chart', get_chart_data); //get_static_data);
+
+    // use static middleware ---> Static file handlers - or replace by handing in webserver config
+    app.get('/css/:filename', sendStaticFileForPath('css'));
+    app.get( '/js/:filename', sendStaticFileForPath('js' ));
+    app.get('/img/:filename', sendStaticFileForPath('img'));
+
+    // open port for listening to connections
+    app.listen(listenPort, function () {
+        console.log('webserver listening on port ' + listenPort + '!');
+    })
+}
 
 
 
-// use static middleware ---> Static file handlers - or replace by handing in webserver config
-app.get('/css/:filename', sendStaticFileForPath('css'));
-app.get( '/js/:filename', sendStaticFileForPath('js' ));
-app.get('/img/:filename', sendStaticFileForPath('img'));
-
-
-app.listen(listenPort, function () {
-    console.log('webserver listening on port ' + listenPort + '!');
-})
-
+main();

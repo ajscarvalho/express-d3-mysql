@@ -5,6 +5,7 @@ var version = "1.0.0";
 
 var ChartsAPI = new ChartRequests();
 
+function dict_length(d) { let c = 0; for (let p in d) { c++; }; return c; }
 
 function main() {
     let chartContainers = get_chart_containers();
@@ -22,33 +23,36 @@ function fetch_chart(chartContainer) {
     let start       = chartContainer.getAttribute('data-chart-start');
     let end         = chartContainer.getAttribute('data-chart-end');
     let sources     = chartContainer.getAttribute('data-chart-sources');
+    if (!sources) sources = '';
+
 console.log('fetch', chartType, start, end, sources);
 
     ChartsAPI.requestChart(start, end, sources, draw_chart.bind(null, chartContainer, chartType));
- 
+
 }
 
 var draw_chart = function(chartContainer, chartType, data) {
     console.log('draw', chartContainer, chartType, data);
+    
+    var seriesCardinality = dict_length(data.seriesLegend), // dict representing series Legend (The number of series).
+        xCardinality = data.xLegend.length;                 // array with X Labels - The number of values per series.
 
-    var n = 4, // The number of series.
-        m = 58; // The number of values per series.
+    return;
 
     // The xz array has m elements, representing the x-values shared by all series.
     // The yz array has n elements, representing the y-values of each of the n series.
     // Each yz[i] is an array of m non-negative numbers representing a y-value for xz[i].
     // The y01z array has the same structure as yz, but with stacked [y₀, y₁] instead of y.
-    var xz = d3.range(m),
-        yz = d3.range(n).map(function() { return bumps(m); }),
-        y01z = d3.stack().keys(d3.range(n))(d3.transpose(yz)),
+    var xz = d3.range(xCardinality),
+        yz = d3.range(seriesCardinality).map(function() { return bumps(xCardinality); }),
+        y01z = d3.stack().keys(d3.range(seriesCardinality))(d3.transpose(yz)),
         yMax = d3.max(yz, function(y) { return d3.max(y); }),
         y1Max = d3.max(y01z, function(y) { return d3.max(y, function(d) { return d[1]; }); });
 
-    var svg = d3.select("svg"),
-        margin = {top: 40, right: 10, bottom: 20, left: 10},
-        width = +svg.attr("width") - margin.left - margin.right,
-        height = +svg.attr("height") - margin.top - margin.bottom,
-        g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var margin = {top: 40, right: 10, bottom: 20, left: 10},
+        width = +chartContainer.attr("width") - margin.left - margin.right,
+        height = +chartContainer.attr("height") - margin.top - margin.bottom,
+        g = chartContainer.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var x = d3.scaleBand()
         .domain(xz)
@@ -59,8 +63,9 @@ var draw_chart = function(chartContainer, chartType, data) {
         .domain([0, y1Max])
         .range([height, 0]);
 
+    // set color scheme
     var color = d3.scaleOrdinal()
-        .domain(d3.range(n))
+        .domain(d3.range(seriesCardinality))
         .range(d3.schemeCategory20c);
 
     var series = g.selectAll(".series")
@@ -91,11 +96,6 @@ var draw_chart = function(chartContainer, chartType, data) {
     d3.selectAll("input")
         .on("change", changed);
 
-    var timeout = d3.timeout(function() {
-      d3.select("input[value=\"grouped\"]")
-          .property("checked", true)
-          .dispatch("change");
-    }, 2000);
 }
 
 function changed() {

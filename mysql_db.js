@@ -59,8 +59,8 @@ async function insert_points(conn, points) {
 
 async function select_series_by_names(conn, seriesNames) {
     // series_name is auxiliary
-    let sql = "select id, series_name" +  
-        "from data_series ds ";
+    let sql = "select id, series_name " +  
+        "from data_series ";
     let params = [];
 
     if (seriesNames) {
@@ -70,7 +70,7 @@ async function select_series_by_names(conn, seriesNames) {
 
     let result = await conn.query(sql, params);
     let row = result[0][0];
-    console.log('Sample Row: ', row)
+    console.log('Series By Names -  Sample Row: ', row)
     if (!row) return null;
     return result[0]; // 0 -> query result; 0 -> first row; id -> field
 }
@@ -79,12 +79,13 @@ async function select_series_by_names(conn, seriesNames) {
 async function select_points(conn, seriesIds, start, end) {
     // series_name is auxiliary
     let sql = "select data_series_id, ts, value " +  
-        "from data_point dp " + 
-        "where data_series_id in (?) and ts between ? and ? "
+        "from data_point " + 
+        "where data_series_id in (?) and ts >= ? and ts < ? " + 
+        "order by ts asc ";
 
-    let result = await conn.query(sql, [seriesNames, start, end]);
+    let result = await conn.query(sql, [seriesIds, start, end]);
     let row = result[0][0];
-    console.log('Sample Row: ', row)
+    console.log('Points - Sample Row: ', row)
     if (!row) return null;
     return result[0]; // 0 -> query result; 0 -> first row; id -> field
 }
