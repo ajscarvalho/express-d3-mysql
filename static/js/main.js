@@ -31,11 +31,36 @@ console.log('fetch', chartType, start, end, sources);
 
 }
 
+
+var get_series_list = function(seriesLegend) {
+    let seriesData = {l: [], d: {} };
+    let i = 0; 
+    for (let s in seriesLegend) {
+        seriesData.l[i] = {id:  s, legend: seriesLegend[s] };
+        seriesData.d[s] = {pos: i, legend: seriesLegend[s] };
+        i+= 1;
+    }
+    return seriesData;
+}
+
 var draw_chart = function(chartContainer, chartType, data) {
     console.log('draw', chartContainer, chartType, data);
     
-    var seriesCardinality = dict_length(data.seriesLegend), // dict representing series Legend (The number of series).
+    let seriesCardinality = dict_length(data.seriesLegend), // dict representing series Legend (The number of series).
         xCardinality = data.xLegend.length;                 // array with X Labels - The number of values per series.
+
+    let seriesList = get_series_list(data.seriesLegend);
+    console.log("seriesList", seriesList);
+//    var xLegend = get_horizontal_legend(data.xLegend);
+//    console.log('xLegend', xLegend);
+
+    let xz = d3.range(xCardinality),
+        yz = d3.range(seriesCardinality);
+    
+    // TODO fill yz
+
+    let yMax = d3.max(yz, function(y) { return d3.max(y); });
+
 
     return;
 
@@ -43,10 +68,10 @@ var draw_chart = function(chartContainer, chartType, data) {
     // The yz array has n elements, representing the y-values of each of the n series.
     // Each yz[i] is an array of m non-negative numbers representing a y-value for xz[i].
     // The y01z array has the same structure as yz, but with stacked [y₀, y₁] instead of y.
-    var xz = d3.range(xCardinality),
-        yz = d3.range(seriesCardinality).map(function() { return bumps(xCardinality); }),
-        y01z = d3.stack().keys(d3.range(seriesCardinality))(d3.transpose(yz)),
-        yMax = d3.max(yz, function(y) { return d3.max(y); }),
+    //var //xz = d3.range(xCardinality),
+        //yz = d3.range(seriesCardinality).map(function() { return bumps(xCardinality); }),
+    var    y01z = d3.stack().keys(d3.range(seriesCardinality))(d3.transpose(yz)),
+//        yMax = d3.max(yz, function(y) { return d3.max(y); }),
         y1Max = d3.max(y01z, function(y) { return d3.max(y, function(d) { return d[1]; }); });
 
     var margin = {top: 40, right: 10, bottom: 20, left: 10},

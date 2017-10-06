@@ -2,11 +2,12 @@
 
 const path = require('path');
 
-const express = require('express')
-const exphbs  = require('express-handlebars');
-const mysqlDB = require('./mysql_db')
+const express   = require('express')
+const exphbs    = require('express-handlebars');
 
-const config = require('./config');
+const MySQLConn = require('./mysql_db')
+const config    = require('./config');
+
 
 let conn = null; // db connection (as a global, can also create singleton or use dependency injection)
 
@@ -48,7 +49,7 @@ var get_chart_data = async function(req, res){
     let seriesNames = req.query.sources.split(',');
 //console.log('get_chart_data', start, end, seriesNames);
 
-    let series = await mysqlDB.select_series_by_names(conn, seriesNames);
+    let series = await conn.select_series_by_names(seriesNames);
 //console.log('series', series);
 
     let seriesDict = {};
@@ -58,14 +59,16 @@ var get_chart_data = async function(req, res){
     let seriesIds = series.map( (x) => x.id);
 //console.log('series ids', seriesIds);
     
-    let points  = await mysqlDB.select_points(conn, seriesIds, start, end);
+    let points  = await conn.select_points(seriesIds, start, end);
 //console.log('points', points.length, 'example', points[0]);
 
 //console.log("typeof", typeof points[0].ts, points[0].ts, typeof points[0].ts.toString())
 
+// create xLegend
     let xLegend = [];
     for (let p of points) {
-        let ts = p.ts.toString(); // or other format for date (if this is indeed a date object...)
+        let ts = p.ts.toISOString(); // or other format for date (if this is indeed a date object...)
+        ts = ts.substring(0, 19).replace('T', ' ');
         let xpos = xLegend.indexOf(ts)
         if (xpos == -1) {
             xpos = xLegend.length;
@@ -107,7 +110,7 @@ var get_static_data = function(req, res){
 
 async function main()
 {
-    conn = await mysqlDB.get_db_connection(config.mysql);
+    conn = await new MySQLConn().connect(config.mysql);
 
     const app = express();
     const hbs =  exphbs.create({ // express handlebars rendering engine initialization
