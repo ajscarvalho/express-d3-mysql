@@ -44,10 +44,24 @@ var get_series_list = function(seriesLegend) {
 }
 
 var draw_chart = function(chartContainer, chartType, data) {
-    console.log('draw', chartContainer, chartType, data);
+
+    // config
+    let margin = {top: 10, right: 10, bottom: 60, left: 20};
+    let barSpacing = 5;
+    // calculated in terms of existing container
+    let svgWidth  = chartContainer.width.baseVal.value;
+    let svgHeight = chartContainer.height.baseVal.value;
+
+    let graphWidth  = svgWidth  - margin.left - margin.right;
+    let graphHeight = svgHeight - margin.top  - margin.bottom;
+
+    let seriesCardinality = dict_length(data.seriesLegend); // dict representing series Legend (The number of series).
+    let xCardinality      = data.xLegend.length;            // array with X Labels - The number of values per series.
     
-    let seriesCardinality = dict_length(data.seriesLegend), // dict representing series Legend (The number of series).
-        xCardinality = data.xLegend.length;                 // array with X Labels - The number of values per series.
+    let barWidth = Math.floor(graphWidth / xCardinality) - barSpacing;
+
+//    console.log('draw', chartContainer, chartType, data, svgWidth);
+//    console.log('bar width', barWidth);
 
     let seriesList = get_series_list(data.seriesLegend);
     console.log("seriesList", seriesList);
@@ -55,74 +69,94 @@ var draw_chart = function(chartContainer, chartType, data) {
 //    console.log('xLegend', xLegend);
 
     let xz = d3.range(xCardinality),
-        yz = d3.range(seriesCardinality);
+        yz = d3.range(seriesCardinality).map(function() { return d3.range(xCardinality) });
     
+    for (let pt of data.points) {
+        let s = seriesList.d[pt.data_series_id];
+        yz[s.pos][pt.x] = pt.value;
+    }
+    console.log("data", data);
+    console.log("yz", yz);
     // TODO fill yz
 
     let yMax = d3.max(yz, function(y) { return d3.max(y); });
 
+    let svg = d3.select(chartContainer);
+    let g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    return;
-
-    // The xz array has m elements, representing the x-values shared by all series.
-    // The yz array has n elements, representing the y-values of each of the n series.
-    // Each yz[i] is an array of m non-negative numbers representing a y-value for xz[i].
     // The y01z array has the same structure as yz, but with stacked [y₀, y₁] instead of y.
-    //var //xz = d3.range(xCardinality),
-        //yz = d3.range(seriesCardinality).map(function() { return bumps(xCardinality); }),
-    var    y01z = d3.stack().keys(d3.range(seriesCardinality))(d3.transpose(yz)),
-//        yMax = d3.max(yz, function(y) { return d3.max(y); }),
-        y1Max = d3.max(y01z, function(y) { return d3.max(y, function(d) { return d[1]; }); });
+    let y01z = d3.stack().keys(d3.range(seriesCardinality))(d3.transpose(yz));
+    let y1Max = d3.max(y01z, function(yy) { return d3.max(yy, function(dd) { return dd[1]; } ); }); // ???
 
-    var margin = {top: 40, right: 10, bottom: 20, left: 10},
-        width = +chartContainer.attr("width") - margin.left - margin.right,
-        height = +chartContainer.attr("height") - margin.top - margin.bottom,
-        g = chartContainer.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var x = d3.scaleBand()
-        .domain(xz)
-        .rangeRound([0, width])
-        .padding(0.08);
+    // axis
+    let xScale = d3.scaleLinear()
+        .domain( [0, xCardinality - 1] )
+        .range( [0, graphWidth] );
 
-    var y = d3.scaleLinear()
+    let yScale = d3.scaleLinear()
         .domain([0, y1Max])
-        .range([height, 0]);
+        .range([graphHeight, 0]);
 
     // set color scheme
-    var color = d3.scaleOrdinal()
+    var colorScheme = d3.scaleOrdinal()
         .domain(d3.range(seriesCardinality))
         .range(d3.schemeCategory20c);
+
+    var yAxis = d3.axisLeft()
+        .scale(yScale)
+        .tickSize(1)
+        .tickFormat(function(d) { return d + "M"}); // Math.round(d / 1e6) + "M"; });
+
 
     var series = g.selectAll(".series")
       .data(y01z)
       .enter().append("g")
-        .attr("fill", function(d, i) { return color(i); });
+        .attr("fill", function(d, i) { return colorScheme(i); });
 
     var rect = series.selectAll("rect")
       .data(function(d) { return d; })
       .enter().append("rect")
-        .attr("x", function(d, i) { return x(i); })
-        .attr("y", height)
-        .attr("width", x.bandwidth())
+        .attr("x", function(d, i) { return xScale(i); })
+        .attr("y", graphHeight)
+        .attr("width", barWidth)//xScale.bandwidth())
         .attr("height", 0);
 
     rect.transition()
         .delay(function(d, i) { return i * 10; })
-        .attr("y", function(d) { return y(d[1]); })
-        .attr("height", function(d) { return y(d[0]) - y(d[1]); });
+        .attr("y", function(d) { return yScale(d[1]); })
+        .attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); });
 
+    // add x-axis.
+//*    
     g.append("g")
-        .attr("class", "axis axis--x")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x)
-            .tickSize(0)
-            .tickPadding(6));
+//        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + graphHeight + ")")
+        .call(d3.axisBottom(xScale)
+            .tickSize(1)
+            .tickPadding(6)
+            .tickFormat(function(d) { return data.xLegend[d]; })
+        )
+        .selectAll("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", 9)
+        
+//        .attr("transform", "translate(" + barWidth/2 + ", 100); rotate(-90)");
+//*/
+    // Add y-axis.
+    g.append("g")
+        .attr("class", "axis axis--y")
+      //  .attr("transform", "translate(10, 0)")
+        .call(yAxis)
+    .selectAll("g")
+    .filter(function(value) { return value != '0M'; })
+        .classed("zero", true);
+    
+    return;
 
-    d3.selectAll("input")
-        .on("change", changed);
 
 }
-
+/*
 function changed() {
   timeout.stop();
   if (this.value === "grouped") transitionGrouped();
@@ -185,5 +219,5 @@ function bumps(m) {
   return values;
 }
 
-
+*/
 setTimeout(main, 0); // schedule function to be run as soon as possible

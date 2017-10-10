@@ -121,8 +121,8 @@ use: await Promise.all([])
             try {
                 return await this.conn.query(sql, params);
             } catch(e) {
+                if (this.is_disconnect_error(e)) { this.connect(); continue; }
                 console.error('E', e, 'e.name', e.name, 'e.code', e.code, 'e.message', e.message, 'e.trace', e.trace);
-                // detect and understand error -> reconnect
             }
             return null;
         } while(true);
@@ -133,11 +133,16 @@ use: await Promise.all([])
             try {
                 return await this.conn.execute(sql, params);
             } catch(e) {
+                if (this.is_disconnect_error(e)) { this.connect(); continue; }
                 console.error('E', e, 'e.name', e.name, 'e.code', e.code, 'e.message', e.message, 'e.trace', e.trace);
-                // detect and understand error -> reconnect
             }
             return null;
         } while(true);
+    }
+
+    is_disconnect_error(e) {
+        if (['EPIPE'].indexOf(e.code) === -1) return false;
+        return true;
     }
 }
 
