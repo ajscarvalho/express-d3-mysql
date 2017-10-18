@@ -2,11 +2,12 @@
 
 const path = require('path');
 
-const express   = require('express')
+const express   = require('express');
 const exphbs    = require('express-handlebars');
 
-const MySQLConn = require('./mysql_db')
-const config    = require('./config');
+const MySQLConn     = require('./mysql_db');
+const OracleConn    = require('./oracle_db');
+const config        = require('./config');
 
 
 let conn = null; // db connection (as a global, can also create singleton or use dependency injection)
@@ -110,7 +111,16 @@ var get_static_data = function(req, res){
 
 async function main()
 {
-    conn = await new MySQLConn().connect(config.mysql);
+    console.log("ARGV", process.argv);
+
+    if (process.argv[2] == 'mysql') {
+        conn = await new MySQLConn().connect(config.mysql);
+    } else if (process.argv[2] == 'oracle') {
+        conn = await new OracleConn().connect(config.oracle);
+    } else {
+        console.log("supply database type to use: [mysql, oracle]");
+        process.exit(1);
+    }
 
     const app = express();
     const hbs =  exphbs.create({ // express handlebars rendering engine initialization

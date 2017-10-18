@@ -144,6 +144,9 @@ use: await Promise.all([])
         if (['EPIPE'].indexOf(e.code) === -1) return false;
         return true;
     }
+
+    async commit() { return null; } // not required - aut-commit is on!
+
 }
 
 module.exports = DbHandler;
