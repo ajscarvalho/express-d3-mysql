@@ -5,13 +5,41 @@ var version = "1.0.0";
 
 var ChartsAPI = new ChartRequests();
 
+var mapaAPI = new mapaRequests();
+
+
 function dict_length(d) { let c = 0; for (let p in d) { c++; }; return c; }
 
+
+var change_colours = function(data)
+{
+    console.log("change_colours",data.colour);
+	let concelhos = document.getElementsByClassName("async-concelho"); 
+
+   for (let conc of concelhos) 
+   {
+    let nome = conc.getAttribute("name");
+    for(let it of data.colour)
+
+    	if(it.concelho == nome)
+    	{
+    		console.log("Mudou  :",nome, it.colour)
+			conc.setAttribute("fill", it.colour);	
+    		
+    	}
+
+   }
+		return;
+}
+
 function main() {
+
     let chartContainers = get_chart_containers();
     for (let chartContainer of chartContainers) {
         fetch_chart(chartContainer);
     }
+    mapaAPI.requestmapa(null,change_colours.bind(null));
+    
 };
 
 function get_chart_containers() {
@@ -25,7 +53,7 @@ function fetch_chart(chartContainer) {
     let sources     = chartContainer.getAttribute('data-chart-sources');
     if (!sources) sources = '';
 
-console.log('fetch', chartType, start, end, sources);
+	//console.log('fetch', chartType, start, end, sources);
 
     ChartsAPI.requestChart(start, end, sources, draw_chart.bind(null, chartContainer, chartType));
 
@@ -64,7 +92,7 @@ var draw_chart = function(chartContainer, chartType, data) {
 //    console.log('bar width', barWidth);
 
     let seriesList = get_series_list(data.seriesLegend);
-    console.log("seriesList", seriesList);
+    //console.log("seriesList", seriesList);
 //    var xLegend = get_horizontal_legend(data.xLegend);
 //    console.log('xLegend', xLegend);
 
@@ -75,8 +103,8 @@ var draw_chart = function(chartContainer, chartType, data) {
         let s = seriesList.d[pt.data_series_id];
         yz[s.pos][pt.x] = pt.value;
     }
-    console.log("data", data);
-    console.log("yz", yz);
+    //console.log("data", data);
+    //console.log("yz", yz);
     // TODO fill yz
 
     let yMax = d3.max(yz, function(y) { return d3.max(y); });
@@ -156,6 +184,12 @@ var draw_chart = function(chartContainer, chartType, data) {
 
 
 }
+
+
+
+
+
+
 /*
 function changed() {
   timeout.stop();
