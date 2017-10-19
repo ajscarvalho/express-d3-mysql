@@ -1,0 +1,8 @@
+ORACLE INSTALL
+
+set PATH=%PATH%;C:\oraclexe\app\oracle\product\11.2.0\server\oci\include;C:\oraclexe\product\11.2.0\server\bin
+set OCI_INC_DIR=C:\oraclexe\app\oracle\product\11.2.0\server\oci\include
+set OCI_LIB_DIR=C:\oraclexe\app\oracle\product\11.2.0\server\oci\lib\MSVC
+
+
+Or instant client 12...
