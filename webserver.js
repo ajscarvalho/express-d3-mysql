@@ -86,7 +86,7 @@ var get_mapa_data = async function(req, res){
     let colour = await conn.get_colour();
 //    console.log('get_mapa_data',colour[0]);
 
- return res.json({colour: colour[0]});
+ return res.json({colour: colour});
 };
 
 

@@ -20,13 +20,14 @@ var change_colours = function(data)
    {
     let nome = conc.getAttribute("name");
     for(let it of data.colour)
-
     	if(it.concelho == nome)
     	{
-    		console.log("Mudou  :",nome, it.colour)
+    		//console.log("Mudou:  ",nome, it.colour)
 			conc.setAttribute("fill", it.colour);	
-    		
     	}
+    	
+  	 if(conc.getAttribute("fill") == "#000000")
+    	console.log("Não Mudou:  ", nome, conc.getAttribute("fill"));
 
    }
 		return;
