@@ -4,6 +4,7 @@ var version = "1.0.0";
 
 
 var ChartsAPI = new ChartRequests();
+var inputHandler = new HomeInputHandler();
 
 var mapaAPI = new mapaRequests();
 
@@ -55,9 +56,10 @@ function main() {
     for (let chartContainer of chartContainers) {
         fetch_chart(chartContainer);
     }
+    inputHandler.defineCallBack(fetch_charts_on_change);
     mapaAPI.requestmapa(null,change_colours.bind(null));
-    
 };
+
 
 function get_chart_containers() {
     return document.querySelectorAll('.async-chart');
@@ -75,6 +77,25 @@ function fetch_chart(chartContainer) {
     ChartsAPI.requestChart(start, end, sources, draw_chart.bind(null, chartContainer, chartType));
 
 }
+
+function fetch_charts_on_change(data) 
+{
+    let chartContainers = get_chart_containers();
+    let sources1  = data.single;
+    let sources2  = data.multi;
+    let start     = data.start; 
+    let end       = data.end;
+    let chartType = "something_to_change_displaying_of_chart"
+
+    for (let chartContainer of chartContainers) {
+        d3.select(chartContainer).select('svg').remove();
+    }
+
+    ChartsAPI.requestChart(start, end, sources1, draw_chart.bind(null, chartContainers[0], chartType));
+    ChartsAPI.requestChart(start, end, sources2, draw_chart.bind(null, chartContainers[1], chartType));
+}
+
+
 
 
 var get_series_list = function(seriesLegend) {
@@ -94,8 +115,8 @@ var draw_chart = function(chartContainer, chartType, data) {
     let margin = {top: 10, right: 10, bottom: 60, left: 20};
     let barSpacing = 5;
     // calculated in terms of existing container
-    let svgWidth  = chartContainer.width.baseVal.value;
-    let svgHeight = chartContainer.height.baseVal.value;
+    let svgWidth  = parseInt(chartContainer.style.width); //chartContainer.width.baseVal.value;
+    let svgHeight = parseInt(chartContainer.style.height);
 
     let graphWidth  = svgWidth  - margin.left - margin.right;
     let graphHeight = svgHeight - margin.top  - margin.bottom;
@@ -126,7 +147,10 @@ var draw_chart = function(chartContainer, chartType, data) {
 
     let yMax = d3.max(yz, function(y) { return d3.max(y); });
 
-    let svg = d3.select(chartContainer);
+//    let svg = d3.select(chartContainer);
+    let svg = d3.select(chartContainer).append("svg")
+        .attr("width", svgWidth).attr("height", svgHeight);
+
     let g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // The y01z array has the same structure as yz, but with stacked [y₀, y₁] instead of y.
