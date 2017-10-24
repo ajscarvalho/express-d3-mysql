@@ -2,16 +2,58 @@
 
 <p>Aqui jaz um gráfico</p>
 
-<svg id="chart_A" class="async-chart big-chart" data-chart-type="type1" data-chart-start="2017-01-01 00:00:00" data-chart-end="2017-01-01 01:00:00" data-chart-sources="solar" style="width: 640px; height: 480px;"></svg>
+<ul>
+    <li>
+        <label>Size</label>
 
+        <input type="radio" class="chart-size" name="chartSize" value="small" /><label class="radio-label">Small</label>
+        <input type="radio" class="chart-size" name="chartSize" value="big" /><label class="radio-label">Big</label>
+    </li>
+    <li>
+        <label for="singleSource">Single Source</label>
+        <select id="sel_single-source" name="singleSource">
+            <option value="solar">Solar</option>
+            <option value="eólica">Eólica</option>
+            <option value="marés">Marés</option>
+            <option value="hidráulica">Hidráulica</option>
+            <option value="fossil">Fossil</option>
+        </select>
+    </li>
+    <li>
+        <label for="multiSource">Multi Source</label>
+        <select id="sel_multi-source" name="multiSource" multiple>
+            <option value="solar">Solar</option>
+            <option value="eólica">Eólica</option>
+            <option value="marés">Marés</option>
+            <option value="hidráulica">Hidráulica</option>
+            <option value="fossil">Fossil</option>
+        </select>
+    </li>
+    <li>
+        <label for="startTs">Start Timestamp</label>
+        <input type="text" id="txt_startTs" name="startTs" value="2017-01-05 00:00:00" />
+    </li>
+    <li>
+        <label for="endTs">End Timestamp</label>
+        <input type="text" id="txt_endTs" name="endTs" value="2017-01-06 00:00:00" />
+    </li>
+    <li>
+        <input type="button" id="btn_apply" value="Apply!">
+    </li>
+</ul>
+
+<div id="chart_A" class="async-chart big-chart" data-chart-type="type1" data-chart-start="2017-01-01 00:00:00" data-chart-end="2017-01-01 01:00:00" data-chart-sources="solar" style="width: 640px; height: 480px;"></div>
+
+
+<div id="chart_B" class="async-chart small-chart" data-chart-type="type1" data-chart-start="2017-01-01 00:00:00" data-chart-end="2017-01-01 01:00:00" data-chart-sources="solar" style="width: 640px; height: 480px;"></div>
 
 
 <!-- COMMENT
 
 <p>Aqui jaz outro gráfico</p>
-<svg id="chart_B" class="async-chart small-chart" data-chart-type="type2" data-chart-start="2017-01-03 00:00:00" data-chart-end="2017-01-04 00:00:00" data-chart-sources="eólica,solar"></svg>
+<div id="chart_B" class="async-chart small-chart" data-chart-type="type2" data-chart-start="2017-01-03 00:00:00" data-chart-end="2017-01-04 00:00:00" data-chart-sources="eólica,solar"></div>
 
-<svg id="chart_C" class="async-chart big-chart" data-chart-type="type3" data-chart-start="2017-01-01 00:00:00" data-chart-end="2017-01-02 00:00:00"></svg>
+<div id="chart_C" class="async-chart big-chart" data-chart-type="type3" data-chart-start="2017-01-01 00:00:00" data-chart-end="2017-01-02 00:00:00"></div>
 
 
 -->
