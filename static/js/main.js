@@ -13,7 +13,7 @@ function dict_length(d) { let c = 0; for (let p in d) { c++; }; return c; }
 
 var change_colours = function(data)
 {
-    console.log("change_colours",data.colour);
+   //console.log("change_colours",data.colour);
 	let concelhos = document.getElementsByClassName("async-concelho"); 
 
    for (let conc of concelhos) 
@@ -31,6 +31,22 @@ var change_colours = function(data)
 
    }
 		return;
+}
+
+function box(x)
+{
+	let nome = x.getAttribute("name");
+//	let p = document.getElementById('popup');
+	console.log("box",nome )
+//	p.style.display = 'block';
+	return;
+}
+function box_out(x)
+{
+//	let p = document.getElementById('popup');
+//	console.log("box_out")
+//	p.style.display = 'none';
+	return;
 }
 
 function main() {
