@@ -56,13 +56,8 @@ function main() {
     for (let chartContainer of chartContainers) {
         fetch_chart(chartContainer);
     }
-<<<<<<< HEAD
-
     inputHandler.defineCallBack(fetch_charts_on_change);
-=======
     mapaAPI.requestmapa(null,change_colours.bind(null));
-    
->>>>>>> master
 };
 
 
