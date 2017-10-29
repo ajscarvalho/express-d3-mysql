@@ -34,10 +34,6 @@ svg {
 
 rect {
   fill-opacity: .6;
-  fill: #e377c2;
 }
 
-rect:first-child {
-  fill: #1f77b4;
-}
 
