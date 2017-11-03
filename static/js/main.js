@@ -110,6 +110,12 @@ var get_series_list = function(seriesLegend) {
 }
 
 var draw_chart = function(chartContainer, chartType, data) {
+    if (chartType == 'stacked')
+        draw_stacked_chart(chartContainer, data)
+    else console.error('unknown chartType', chartType, 'for', chartContainer);
+}
+
+var draw_stacked_chart = function(chartContainer, data) {
 
     // config
     let margin = {top: 10, right: 10, bottom: 60, left: 20};
@@ -145,7 +151,7 @@ var draw_chart = function(chartContainer, chartType, data) {
     //console.log("yz", yz);
     // TODO fill yz
 
-    let yMax = d3.max(yz, function(y) { return d3.max(y); });
+    let yMax = d3.max(yz, function(y) { return d3.sum(y); });
 
 //    let svg = d3.select(chartContainer);
     let svg = d3.select(chartContainer).append("svg")
@@ -160,7 +166,7 @@ var draw_chart = function(chartContainer, chartType, data) {
 
     // axis
     let xScale = d3.scaleLinear()
-        .domain( [0, xCardinality - 1] )
+        .domain( [0, xCardinality] ) // -1
         .range( [0, graphWidth] );
 
     let yScale = d3.scaleLinear()
@@ -172,6 +178,8 @@ var draw_chart = function(chartContainer, chartType, data) {
         .domain(d3.range(seriesCardinality))
         .range(d3.schemeCategory20c);
 
+    console.log("colorScheme", colorScheme(0), colorScheme(1));
+
     var yAxis = d3.axisLeft()
         .scale(yScale)
         .tickSize(1)
@@ -179,9 +187,9 @@ var draw_chart = function(chartContainer, chartType, data) {
 
 
     var series = g.selectAll(".series")
-      .data(y01z)
-      .enter().append("g")
-        .attr("fill", function(d, i) { return colorScheme(i); });
+        .data(y01z)
+        .enter().append("g")
+        .attr("fill", function(d, i) { console.log('fill', d, i); return colorScheme(i); });
 
     var rect = series.selectAll("rect")
       .data(function(d) { return d; })
@@ -193,8 +201,8 @@ var draw_chart = function(chartContainer, chartType, data) {
 
     rect.transition()
         .delay(function(d, i) { return i * 10; })
-        .attr("y", function(d) { return yScale(d[1]); })
-        .attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); });
+        .attr("y", function(d) { console.log('y', d[1], yScale(d[1])); return yScale(d[1]); })
+        .attr("height", function(d) { console.log('height', d[0], d[1], yScale(d[0]) - yScale(d[1])); return yScale(d[0]) - yScale(d[1]); });
 
     // add x-axis.
 //*    
