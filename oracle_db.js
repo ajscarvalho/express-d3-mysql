@@ -24,9 +24,9 @@ class DbHandler {
     async connect(config) {
         if (!config)          config = this.lastConfig;
         else         this.lastConfig = config;
-
         let CS_PortPartial = config.port ? (':' + config.port) : '';
 
+        console.log(config.host + CS_PortPartial);
         this.conn = await oracledb.getConnection({
             user:           config.username,
             password:       config.password,
@@ -154,7 +154,16 @@ use: await Promise.all([])
     }
 
 
-
+    async get_colour() {
+    
+        let sql = "select concelho, colour from ref_concelho_ao where colour is not null group by concelho, colour";
+        let result = await this.query(sql,{},{maxRows: 300});
+        let row = result[0];
+        if (!row) return null;
+        //console.log("Result" , result);
+		return result.map( function(x) { return {concelho: x[0], colour: x[1]} } );
+    }
+    
     /* somewhat private functions */
 
     async query(sql, params, options) {

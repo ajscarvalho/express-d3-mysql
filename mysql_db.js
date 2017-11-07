@@ -92,12 +92,20 @@ use: await Promise.all([])
 
         let result = await this.query(sql, params);
         let row = result[0][0];
-        console.log('Series By Names -  Sample Row: ', row)
+        //console.log('Series By Names -  Sample Row: ', row)
         if (!row) return null;
         return result[0]; // 0 -> query result; 0 -> first row; id -> field
     }
 
 
+    async get_colour() {
+        let sql = "select concelho, colour from ref_concelho_ao where colour is not null group by concelho, colour";
+        let result = await this.query(sql);
+        let row = result[0][0];
+        if (!row) return null;
+        return result[0]; // 0 -> query result; 0 -> first row; id -> field
+    }
+    
     async select_points(seriesIds, start, end) {
         // series_name is auxiliary
         let sql = "select data_series_id, ts, value " +  
@@ -107,7 +115,7 @@ use: await Promise.all([])
 
         let result = await this.query(sql, [seriesIds, start, end]);
         let row = result[0][0];
-        console.log('Points - Sample Row: ', row)
+        //console.log('Points - Sample Row: ', row)
         if (!row) return null;
         return result[0]; // 0 -> query result; 0 -> first row; id -> field
     }

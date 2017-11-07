@@ -45,10 +45,11 @@ function sendStaticFileForPath(path) {
 
 
 var get_chart_data = async function(req, res){
+
     let start = req.query.start;
     let end   = req.query.end;
     let seriesNames = req.query.sources.split(',');
-//console.log('get_chart_data', start, end, seriesNames);
+    console.log('get_chart_data', start, end, seriesNames);
 
     let series = await conn.select_series_by_names(seriesNames);
 //console.log('series', series);
@@ -80,6 +81,13 @@ var get_chart_data = async function(req, res){
 
     return res.json({points: points, seriesLegend: seriesDict, xLegend: xLegend});
 };
+var get_mapa_data = async function(req, res){
+
+    let colour = await conn.get_colour();
+//    console.log('get_mapa_data',colour[0]);
+
+ return res.json({colour: colour});
+};
 
 
 var get_static_data = function(req, res){
@@ -106,7 +114,6 @@ var get_static_data = function(req, res){
     res.json({data: data, legend: seriesNames});
     //res.send('start=' + req.query.start + "<br />" + 'end=' + req.query.end + "<br />Sources: " + req.query.sources);
 };
-
 
 
 async function main()
@@ -139,6 +146,7 @@ async function main()
 
     // [[series, x, y], ]
     app.get('/api/chart', get_chart_data); //get_static_data);
+    app.get('/api/mapa', get_mapa_data); //get_static_data);
 
     // use static middleware ---> Static file handlers - or replace by handing in webserver config
     app.get('/css/:filename', sendStaticFileForPath('css'));

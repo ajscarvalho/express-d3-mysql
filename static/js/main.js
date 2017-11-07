@@ -6,7 +6,49 @@ var version = "1.0.0";
 var ChartsAPI = new ChartRequests();
 var inputHandler = new HomeInputHandler();
 
+var mapaAPI = new mapaRequests();
+
+
 function dict_length(d) { let c = 0; for (let p in d) { c++; }; return c; }
+
+
+var change_colours = function(data)
+{
+   //console.log("change_colours",data.colour);
+	let concelhos = document.getElementsByClassName("async-concelho"); 
+
+   for (let conc of concelhos) 
+   {
+    let nome = conc.getAttribute("name");
+    for(let it of data.colour)
+    	if(it.concelho == nome)
+    	{
+    		//console.log("Mudou:  ",nome, it.colour)
+			conc.setAttribute("fill", it.colour);	
+    	}
+    	
+  	 if(conc.getAttribute("fill") == "#000000")
+    	console.log("Não Mudou:  ", nome, conc.getAttribute("fill"));
+
+   }
+		return;
+}
+
+function box(x)
+{
+	let nome = x.getAttribute("name");
+//	let p = document.getElementById('popup');
+	console.log("box",nome )
+//	p.style.display = 'block';
+	return;
+}
+function box_out(x)
+{
+//	let p = document.getElementById('popup');
+//	console.log("box_out")
+//	p.style.display = 'none';
+	return;
+}
 
 function main() {
 
@@ -14,8 +56,8 @@ function main() {
     for (let chartContainer of chartContainers) {
         fetch_chart(chartContainer);
     }
-
     inputHandler.defineCallBack(fetch_charts_on_change);
+    mapaAPI.requestmapa(null,change_colours.bind(null));
 };
 
 
@@ -30,7 +72,7 @@ function fetch_chart(chartContainer) {
     let sources     = chartContainer.getAttribute('data-chart-sources');
     if (!sources) sources = '';
 
-console.log('fetch', chartType, start, end, sources);
+	//console.log('fetch', chartType, start, end, sources);
 
     ChartsAPI.requestChart(start, end, sources, draw_chart.bind(null, chartContainer, chartType));
 
@@ -94,7 +136,7 @@ var draw_stacked_chart = function(chartContainer, data) {
 //    console.log('bar width', barWidth);
 
     let seriesList = get_series_list(data.seriesLegend);
-    console.log("seriesList", seriesList);
+    //console.log("seriesList", seriesList);
 //    var xLegend = get_horizontal_legend(data.xLegend);
 //    console.log('xLegend', xLegend);
 
@@ -105,8 +147,8 @@ var draw_stacked_chart = function(chartContainer, data) {
         let s = seriesList.d[pt.data_series_id];
         yz[s.pos][pt.x] = pt.value;
     }
-    console.log("data", data);
-    console.log("yz", yz);
+    //console.log("data", data);
+    //console.log("yz", yz);
     // TODO fill yz
 
     let yMax = d3.max(yz, function(y) { return d3.sum(y); });
@@ -191,6 +233,12 @@ var draw_stacked_chart = function(chartContainer, data) {
 
 
 }
+
+
+
+
+
+
 /*
 function changed() {
   timeout.stop();
