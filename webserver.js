@@ -91,6 +91,13 @@ var get_mapa_data = async function(req, res){
     return res.json({colour: colour});
 };
 
+/*
+var get_municipalities_data = async function(req, res){
+    let municipalities = await conn.select_municipalities();
+    console.log(municipalities[0])
+    return res.json(municipalities)    
+}
+*/
 
 var get_static_data = function(req, res){
     console.log(req.query.start, req.query.end, req.query.sources);
@@ -149,6 +156,9 @@ async function main()
     // [[series, x, y], ]
     app.get('/api/chart', get_chart_data); //get_static_data);
     app.get('/api/mapa', get_mapa_data); //get_static_data);
+/*
+    app.get('/api/municipalities',  get_municipalities_data);
+*/
 
     // use static middleware ---> Static file handlers - or replace by handing in webserver config
     app.get('/css/:filename', sendStaticFileForPath('css'));
@@ -162,5 +172,7 @@ async function main()
 }
 
 
+//NLS_LANG=AMERICAN_AMERICA.UTF8 node src/main.js
+// NLS_LANG=AL16UTF16
 
 main();

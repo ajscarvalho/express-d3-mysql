@@ -5,6 +5,7 @@ var version = "1.0.0";
 
 var ChartsAPI = new ChartRequests();
 var inputHandler = new HomeInputHandler();
+var tabHandler = new TabHandler();
 
 var mapaAPI = new mapaRequests();
 
@@ -12,29 +13,39 @@ var mapaAPI = new mapaRequests();
 function dict_length(d) { let c = 0; for (let p in d) { c++; }; return c; }
 
 
-var change_colours = function(data)
-{
-   //console.log("change_colours",data.colour);
-	let concelhos = document.getElementsByClassName("async-concelho"); 
+var mapColourData = {};
 
-	for (let conc of concelhos) 
-	{
-		let nome = conc.getAttribute("name");
-		for(let it of data.colour)
-			if(it.concelho == nome)
-			{
-				//console.log("Mudou:  ",nome, it.colour)
-				conc.setAttribute("fill", it.colour);	
-			}
-		
-	 if(conc.getAttribute("fill") == "#000000")
-		console.log("Não Mudou:  ", nome, conc.getAttribute("fill"));
-
-    }
-	return;
+var incomingMapData = function(data) {
+	mapColourData = {};
+	for (let row of data.colour) {
+		mapColourData[row.concelho] = row;
+	}
+	change_colours();
 }
 
 
+var change_colours = function(data)
+{
+	var mapAggLvl = document.getElementById('mapAggregationLevel');
+	console.log("mapAggLvl", mapAggLvl.value)
+   //console.log("change_colours",data.colour);
+	//let concelhos = document.getElementsByClassName("async-concelho"); 
+	console.log(mapColourData)
+	for (let municipalityName in mapColourData) {
+		let municipality = document.getElementById(municipalityName);
+		if (!municipality) { console.log(municipalityName, 'Not Found'); continue; }
+
+		let record = mapColourData[municipalityName];
+		let property = 'colour';
+		if (mapAggLvl.value == 'ao') property = 'colour_ao';
+		if (mapAggLvl.value == 'drc') property = 'colour_drc';
+
+		municipality.style.fill = record[property];
+	} 
+	
+}
+
+/*
 function box(x)
 {
 	let nome = x.getAttribute("name");
@@ -51,15 +62,23 @@ function box_out(x)
 //	p.style.display = 'none';
 	return;
 }
+*/
 
 function main() {
+    tabHandler.tab_click(document.getElementById('map_tab'));//'chart_tab'))
+
+	var mapAggLvl = document.getElementById('mapAggregationLevel');
+	mapAggLvl.addEventListener('change', change_colours, false)
 
 	let chartContainers = get_chart_containers();
 	for (let chartContainer of chartContainers) {
 		fetch_chart(chartContainer);
 	}
+
 	inputHandler.defineCallBack(fetch_charts_on_change);
-	mapaAPI.requestmapa(null, change_colours.bind(null));
+
+	mapaAPI.requestmapa(null, incomingMapData.bind(null));
+//    fetch_municipalities();
 };
 
 
@@ -79,7 +98,17 @@ function fetch_chart(chartContainer) {
 	ChartsAPI.requestChart(start, end, sources, draw_chart.bind(null, chartContainer, chartType));
 
 }
+/*
+function fetch_municipalities() {
+    console.log('fetch municipalities');
 
+    ChartsAPI.requestMunicipalities(drawMunicipalities.bind(null));
+}
+
+function drawMunicipalities(data) {
+    console.log(data[0]);
+}
+*/
 function fetch_charts_on_change(data) 
 {
 	let chartContainers = get_chart_containers();

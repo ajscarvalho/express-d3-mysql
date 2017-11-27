@@ -1,11 +1,11 @@
 "use strict";
 
-var config = require('./config');
+var config = require('../config');
 
-var MySQLConn   = require('./mysql_db');
-var OracleConn  = require('./oracle_db');
+var MySQLConn   = require('../mysql_db');
+var OracleConn  = require('../oracle_db');
 
-var DataPoint   = require('./db_object/data_point');
+var DataPoint   = require('../db_object/data_point');
 
 
 const SERIES_NAMES = ['fossil', 'hidráulica', 'solar', 'eólica', 'marés'];

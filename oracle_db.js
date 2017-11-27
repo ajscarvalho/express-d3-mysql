@@ -3,6 +3,9 @@
  * if this is to be really used, turn code and globals (e.g. conn, LastConfig) into class and properties 
  */
 
+
+// Charset AL32UTF8 or use NVARCHAR2 columns
+
 var DataSeries  = require('./db_object/data_series');
 var DataPoint   = require('./db_object/data_point');
 
@@ -26,7 +29,7 @@ class DbHandler {
         else         this.lastConfig = config;
         let CS_PortPartial = config.port ? (':' + config.port) : '';
 
-        console.log(config.host + CS_PortPartial);
+//        console.log(config.host + CS_PortPartial);
         this.conn = await oracledb.getConnection({
             user:           config.username,
             password:       config.password,
@@ -36,6 +39,7 @@ class DbHandler {
         if (config.database)
             await this.conn.execute('ALTER SESSION SET CURRENT_SCHEMA = ' + config.database);
 
+//oracledb.fetchAsString = [ oracledb.NUMBER ];
         return this;
     }
 
@@ -52,7 +56,7 @@ class DbHandler {
         console.log('get_series');
         let sql = "select id from data_series where series_name = :series_name";
         let result = await this.query(sql, {series_name: seriesName});
-        console.log("Result", result);
+        console.log("get_series", result);
         let row = result[0]; // first row
 //        console.log('get', seriesName, row);
         if (!row) return null;
@@ -160,6 +164,7 @@ use: await Promise.all([])
         let result = await this.query(sql,{},{maxRows: 300});
         let row = result[0];
         if (!row) return null;
+        for (let i = 0; i < 10; i++) console.log(result[i][0]);
         //console.log("Result" , result);
 		return result.map( function(x) { return {
             concelho: x[0], drc: x[1], ao: x[2], colour: x[3], colour_drc: x[4], colour_ao: x[5]

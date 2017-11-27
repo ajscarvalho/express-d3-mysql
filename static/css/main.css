@@ -32,12 +32,16 @@ nav.tab_system ul li { padding: 5px; margin: 0;
 
 
 body {margin: 0;}
-header { background-color: #ffffc0}
-nav {padding: 5px 5px 0 5px; background-color: #ffffc0}
+header { background-color: #ffffff}
+h1 {margin: 0;}
+nav {padding: 5px 5px 0 5px; background-color: #ffffff}
 nav.tab_system ul li:last-child { border-right-width: 1px; }
 nav.tab_system ul li.selected {border-bottom-width: 0;}
 nav.tab_system a {text-decoration: none; color: blue;}
 nav.tab_system li.selected a {color: #444444;}
 
 .tabs-container {padding: 10px 5px 0 5px; background-color: #eeeeee;}
-.tab-content { display: none; }
+.tab-content { display: none; padding: 0 5px; background-color: #eeeeee;}
+
+.some-bottom-margin {margin-bottom: 5px;}
+.some-top-margin {margin-top: 5px;}

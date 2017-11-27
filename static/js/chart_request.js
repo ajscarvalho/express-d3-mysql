@@ -13,3 +13,9 @@ ChartRequests.prototype.requestChart = function(startStr, endStr, sourcesFilter,
     req.send();
 };
 
+
+ChartRequests.prototype.requestMunicipalities = function(callback) {
+    var uri = '/api/municipalities'
+    var req = new HttpRequest('get', uri, callback);
+    req.send();
+};

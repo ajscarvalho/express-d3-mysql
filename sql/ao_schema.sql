@@ -1,6 +1,15 @@
 
 /*** for oracle 12*/
 
+
+/** 
+
+drop table PQ_AO;
+drop table REF_CONCELHO_AO;
+
+*/
+
+
 create table PQ_AO (
     AO          varchar2(80) not null,
     P           varchar2(10) not null,

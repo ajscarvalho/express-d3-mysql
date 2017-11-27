@@ -17,7 +17,7 @@ Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Leiria','426','154',to_t
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Lisboa','170','97',to_timestamp('17.11.22 23:23:16','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.23 23:23:16','RR.MM.DD HH24:MI:SS'));
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Loures','228','74',to_timestamp('17.11.22 23:23:16','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.23 23:23:16','RR.MM.DD HH24:MI:SS'));
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Maia','369','170',to_timestamp('17.11.22 23:23:16','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.23 23:23:16','RR.MM.DD HH24:MI:SS'));
-Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Penafiel Guimar?es','862','474',to_timestamp('17.11.22 23:23:16','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.23 23:23:16','RR.MM.DD HH24:MI:SS'));
+Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Penafiel Guimarães','862','474',to_timestamp('17.11.22 23:23:16','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.23 23:23:16','RR.MM.DD HH24:MI:SS'));
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Portalegre','993','506',to_timestamp('17.11.22 23:23:16','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.23 23:23:16','RR.MM.DD HH24:MI:SS'));
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Porto','161','70',to_timestamp('17.11.22 23:23:16','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.23 23:23:16','RR.MM.DD HH24:MI:SS'));
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Santarem','710','417',to_timestamp('17.11.22 23:23:16','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.23 23:23:16','RR.MM.DD HH24:MI:SS'));
@@ -38,7 +38,7 @@ Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Leiria','555','233',to_t
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Lisboa','339','39',to_timestamp('17.11.21 23:25:01','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.22 23:25:01','RR.MM.DD HH24:MI:SS'));
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Loures','372','101',to_timestamp('17.11.21 23:25:01','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.22 23:25:01','RR.MM.DD HH24:MI:SS'));
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Maia','364','183',to_timestamp('17.11.21 23:25:01','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.22 23:25:01','RR.MM.DD HH24:MI:SS'));
-Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Penafiel Guimar?es','699','546',to_timestamp('17.11.21 23:25:01','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.22 23:25:01','RR.MM.DD HH24:MI:SS'));
+Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Penafiel Guimarães','699','546',to_timestamp('17.11.21 23:25:01','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.22 23:25:01','RR.MM.DD HH24:MI:SS'));
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Portalegre','922','459',to_timestamp('17.11.21 23:25:01','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.22 23:25:01','RR.MM.DD HH24:MI:SS'));
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Porto','111','80',to_timestamp('17.11.21 23:25:01','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.22 23:25:01','RR.MM.DD HH24:MI:SS'));
 Insert into PQ_AO (AO,P,Q,TIME_DATA,TIME_CALC) values ('Santarem','736','300',to_timestamp('17.11.21 23:25:01','RR.MM.DD HH24:MI:SS'),to_timestamp('17.11.22 23:25:01','RR.MM.DD HH24:MI:SS'));
