@@ -1,39 +1,43 @@
 
-svg {
-  font: 10px sans-serif;
+svg { font: 10px sans-serif;}
+
+.y.axis path { display: none; }
+.y.axis line { stroke: #fff;  stroke-opacity: .2; shape-rendering: crispEdges;}
+.y.axis .zero line { stroke: #000; stroke-opacity: 1; }
+
+.title { font: 300 78px Helvetica Neue; fill: #666; }
+
+.birthyear, .age { text-anchor: middle; }
+.birthyear { fill: #fff; }
+
+rect { fill-opacity: .6; }
+ 
+/** tabs */
+ul.flexbox {
+  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;      /* TWEENER - IE 10 */
+  display: -webkit-flex;     /* NEW - Chrome */
+  display: flex;             /* NEW, Spec - Opera 12.1, Firefox 20+ */
 }
 
-.y.axis path {
-  display: none;
-}
-
-.y.axis line {
-  stroke: #fff;
-  stroke-opacity: .2;
-  shape-rendering: crispEdges;
-}
-
-.y.axis .zero line {
-  stroke: #000;
-  stroke-opacity: 1;
-}
-
-.title {
-  font: 300 78px Helvetica Neue;
-  fill: #666;
-}
-
-.birthyear,
-.age {
-  text-anchor: middle;
-}
-
-.birthyear {
-  fill: #fff;
-}
-
-rect {
-  fill-opacity: .6;
+ul {list-style-type: none; padding: 0; margin: 0;}
+nav.tab_system ul li { padding: 5px; margin: 0;
+  border-top-left-radius: 5px; border-top-right-radius: 5px; 
+  border-left-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-right: 0;
+  border-style: solid; border-color: black;
+  background-color: #cccccc;
+  color: #444444;
 }
 
 
+body {margin: 0;}
+header { background-color: #ffffc0}
+nav {padding: 5px 5px 0 5px; background-color: #ffffc0}
+nav.tab_system ul li:last-child { border-right-width: 1px; }
+nav.tab_system ul li.selected {border-bottom-width: 0;}
+nav.tab_system a {text-decoration: none; color: blue;}
+nav.tab_system li.selected a {color: #444444;}
+
+.tabs-container {padding: 10px 5px 0 5px; background-color: #eeeeee;}
+.tab-content { display: none; }

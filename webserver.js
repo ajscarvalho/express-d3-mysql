@@ -81,12 +81,14 @@ var get_chart_data = async function(req, res){
 
     return res.json({points: points, seriesLegend: seriesDict, xLegend: xLegend});
 };
+
+
 var get_mapa_data = async function(req, res){
 
     let colour = await conn.get_colour();
 //    console.log('get_mapa_data',colour[0]);
 
- return res.json({colour: colour});
+    return res.json({colour: colour});
 };
 
 

@@ -13,6 +13,7 @@
   "author": "Alexandre Carvalho",
   "license": "ISC",
   "dependencies": {
+    "async-file": "^2.0.2",
     "d3": "^4.10.2",
     "express": "^4.15.4",
     "express-handlebars": "^3.0.0",

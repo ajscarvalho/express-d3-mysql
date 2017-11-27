@@ -156,12 +156,14 @@ use: await Promise.all([])
 
     async get_colour() {
     
-        let sql = "select concelho, colour from ref_concelho_ao where colour is not null group by concelho, colour";
+        let sql = "select concelho, drc, ao, colour, colour_drc, colour_ao from ref_concelho_ao"; // where colour is not null group by concelho, colour";
         let result = await this.query(sql,{},{maxRows: 300});
         let row = result[0];
         if (!row) return null;
         //console.log("Result" , result);
-		return result.map( function(x) { return {concelho: x[0], colour: x[1]} } );
+		return result.map( function(x) { return {
+            concelho: x[0], drc: x[1], ao: x[2], colour: x[3], colour_drc: x[4], colour_ao: x[5]
+        } } );
     }
     
     /* somewhat private functions */
