@@ -82,6 +82,44 @@ var get_chart_data = async function(req, res){
     return res.json({points: points, seriesLegend: seriesDict, xLegend: xLegend});
 };
 
+var get_pq = async function(req, res){
+
+    let start = req.query.start;
+    let end   = req.query.end;
+    let drc   = req.query.drc;
+    console.log('get_pq', start, end, drc);
+
+    let entries  = await conn.get_pq_for_drc(drc, start, end);
+console.log('entries', entries.length, 'example', entries[0]);
+
+    let seriesDict = ['P', 'Q']
+    let points = []
+    for (let entry of entries) {
+        points.push({data_series_id: 0, ts: entry.t, value: entry.p})
+        points.push({data_series_id: 1, ts: entry.t, value: entry.q})
+    }
+
+console.log('points', points.length, 'example', points[0], points[1]);
+
+//console.log("typeof", typeof points[0].ts, points[0].ts, typeof points[0].ts.toString())
+
+// create xLegend
+    let xLegend = [];
+    for (let p of points) {
+        let ts = p.ts;
+        let xpos = xLegend.indexOf(ts)
+        if (xpos == -1) {
+            xpos = xLegend.length;
+            xLegend.push(ts);
+        } 
+        p.x = xpos;
+    }
+
+console.log('points', points.length, 'example', points[0], points[1]);
+
+    return res.json({points: points, seriesLegend: seriesDict, xLegend: xLegend});
+};
+    
 
 var get_mapa_data = async function(req, res){
 
@@ -90,6 +128,13 @@ var get_mapa_data = async function(req, res){
 
     return res.json({colour: colour});
 };
+
+
+var get_drc_list = async function(req, res) {
+    let drcs = await conn.get_distinct_drc();
+    return res.json(drcs);    
+}
+
 
 /*
 var get_municipalities_data = async function(req, res){
@@ -154,8 +199,10 @@ async function main()
     });
 
     // [[series, x, y], ]
-    app.get('/api/chart', get_chart_data); //get_static_data);
+    //app.get('/api/chart', get_chart_data); //get_static_data);
+    app.get('/api/pq',   get_pq)
     app.get('/api/mapa', get_mapa_data); //get_static_data);
+    app.get('/api/drcs', get_drc_list);
 /*
     app.get('/api/municipalities',  get_municipalities_data);
 */

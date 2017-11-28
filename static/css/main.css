@@ -1,4 +1,5 @@
 
+html {font-family: Calibri, Verdana, Arial, sans-serif}
 svg { font: 10px sans-serif;}
 
 .y.axis path { display: none; }
@@ -26,22 +27,31 @@ nav.tab_system ul li { padding: 5px; margin: 0;
   border-top-left-radius: 5px; border-top-right-radius: 5px; 
   border-left-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-right: 0;
   border-style: solid; border-color: black;
-  background-color: #cccccc;
+  background-color: #eeeeee;
   color: #444444;
 }
 
 
 body {margin: 0;}
 header { background-color: #ffffff}
-h1 {margin: 0;}
+header img {max-width: 320px;}
+h1 {margin: 0; font-size: 1.5em; font-weight: normal; color: rgb( 19,  48,  53);}
 nav {padding: 5px 5px 0 5px; background-color: #ffffff}
 nav.tab_system ul li:last-child { border-right-width: 1px; }
 nav.tab_system ul li.selected {border-bottom-width: 0;}
-nav.tab_system a {text-decoration: none; color: blue;}
-nav.tab_system li.selected a {color: #444444;}
+nav.tab_system a {text-decoration: none;  color: rgb( 19,  48,  53);}
+nav.tab_system li.selected a {            color: rgb(164, 155,  36);}
 
 .tabs-container {padding: 10px 5px 0 5px; background-color: #eeeeee;}
 .tab-content { display: none; padding: 0 5px; background-color: #eeeeee;}
 
 .some-bottom-margin {margin-bottom: 5px;}
 .some-top-margin {margin-top: 5px;}
+
+#svg_portugal {max-width: 310; max-height: 455px;}
+
+.big-chart {max-width: 100%; height: 455px;}
+
+.footer__links {margin: 5px 5px 20px 5px; font-size: 0.8em; text-align: center;}
+.footer__links a        { color: rgb(164, 155,  36); line-height: 20px;}
+.footer__links a:hover  { color: rgb( 19,  48,  53); }

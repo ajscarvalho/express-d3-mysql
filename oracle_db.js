@@ -21,6 +21,7 @@ class DbHandler {
     constructor() {
         this.conn = null;
         this.lastConfig = null;
+        this.dateFormat = "'YYYY-MM-DD HH24:MI:SS'";
     }
 
 
@@ -65,7 +66,7 @@ class DbHandler {
 
 
     async create_series(seriesName) {
-        console.log('create_series');
+//        console.log('create_series');
         let sql = "insert into data_series(series_name) values(:series_name) returning id into :out_id";
         let params = {
             series_name:    seriesName, 
@@ -164,14 +165,86 @@ use: await Promise.all([])
         let result = await this.query(sql,{},{maxRows: 300});
         let row = result[0];
         if (!row) return null;
-        for (let i = 0; i < 10; i++) console.log(result[i][0]);
+//        for (let i = 0; i < 10; i++) console.log(result[i][0]);
         //console.log("Result" , result);
 		return result.map( function(x) { return {
             concelho: x[0], drc: x[1], ao: x[2], colour: x[3], colour_drc: x[4], colour_ao: x[5]
         } } );
     }
+
+    async get_distinct_drc() {
     
+        let sql = "select distinct drc from ref_concelho_ao"; // where colour is not null group by concelho, colour";
+        let result = await this.query(sql, {});
+        let row = result[0];
+        if (!row) return null;
+//        for (let i = 0; i < result.length; i++) console.log('DRC', result[i][0]);
+        //console.log("Result" , result);
+
+        return result.map( function(x) { return x[0] } );
+    }
+
+
+    async get_pq_for_drc(drc, start, end) {
+    
+        let drcSubquery = 'and ao in (select distinct ao from ref_concelho_ao where drc = :drc) '
+
+        let sql = "select sum(p), sum(q), " + this.oracle_output_date('time_data') + 
+            "from PQ_AO " + 
+//            "where time_data between " + this.oracle_to_date(':startTs') + 
+//                "and " + this.oracle_to_date(':endTs') + 
+            "where time_data >= " + this.oracle_to_date(':startTs') + 
+            "and   time_data <  " + this.oracle_to_date(':endTs') +
+            "{sq} " +
+            "group by time_data " +
+            "order by time_data asc";
+
+
+        if (!drc) drcSubquery = '';
+        sql = sql.replace('{sq}', drcSubquery);
+
+        let params = {
+            startTs: start,
+            endTs:   end
+        }
+
+        if (drc) params['drc'] = drc;
+console.log(sql, params);
+        let result = await this.query(sql, params);
+        console.log(result);
+
+        //console.log("Result" , result);
+        return result.map( function(x) { return {p: x[0], q: x[1], t: x[2] } });
+    }
+
+
+    /** makes sense? 
+    async get_ao_drc_mapping() {
+    
+        let sql = "select distinct ao, drc from ref_concelho_ao"; // where colour is not null group by concelho, colour";
+        let result = await this.query(sql, {});
+        let row = result[0];
+        if (!row) return null;
+        let aoMap = {}
+        for (row of result)
+            aoMap[row[0]] = row[1];
+
+        //console.log("Result" , result);
+        return aoMap;
+    }
+    */
+
     /* somewhat private functions */
+
+    oracle_to_date(param) {
+        return "to_date(" + param + ", " + this.dateFormat + ") ";
+    }
+
+    oracle_output_date(param) {
+        return "to_char(" + param + ", " + this.dateFormat + ") ";
+    }
+
+
 
     async query(sql, params, options) {
         options = options || {};

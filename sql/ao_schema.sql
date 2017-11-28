@@ -12,8 +12,8 @@ drop table REF_CONCELHO_AO;
 
 create table PQ_AO (
     AO          varchar2(80) not null,
-    P           varchar2(10) not null,
-    Q           varchar2(10) not null,
+    P           number not null,
+    Q           number not null,
     TIME_DATA   timestamp,
     TIME_CALC   timestamp
 );

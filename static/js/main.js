@@ -65,18 +65,14 @@ function box_out(x)
 */
 
 function main() {
-    tabHandler.tab_click(document.getElementById('map_tab'));//'chart_tab'))
+    tabHandler.tab_click(document.getElementById('chart_tab'));//chart_tab, map_tab
 
 	var mapAggLvl = document.getElementById('mapAggregationLevel');
 	mapAggLvl.addEventListener('change', change_colours, false)
 
-	let chartContainers = get_chart_containers();
-	for (let chartContainer of chartContainers) {
-		fetch_chart(chartContainer);
-	}
-
+	ChartsAPI.get_drc_list(inputHandler.fillDRCs.bind(inputHandler));
 	inputHandler.defineCallBack(fetch_charts_on_change);
-
+	inputHandler.apply() // fetch
 	mapaAPI.requestmapa(null, incomingMapData.bind(null));
 //    fetch_municipalities();
 };
@@ -86,44 +82,22 @@ function get_chart_containers() {
 	return document.querySelectorAll('.async-chart');
 }
 
-function fetch_chart(chartContainer) {
-	let chartType   = chartContainer.getAttribute('data-chart-type');
-	let start       = chartContainer.getAttribute('data-chart-start');
-	let end         = chartContainer.getAttribute('data-chart-end');
-	let sources     = chartContainer.getAttribute('data-chart-sources');
-	if (!sources) sources = '';
-
-	//console.log('fetch', chartType, start, end, sources);
-
-	ChartsAPI.requestChart(start, end, sources, draw_chart.bind(null, chartContainer, chartType));
-
-}
-/*
-function fetch_municipalities() {
-    console.log('fetch municipalities');
-
-    ChartsAPI.requestMunicipalities(drawMunicipalities.bind(null));
-}
-
-function drawMunicipalities(data) {
-    console.log(data[0]);
-}
-*/
 function fetch_charts_on_change(data) 
 {
 	let chartContainers = get_chart_containers();
-	let sources1  = data.single;
-	let sources2  = data.multi;
+	let drc 	  = data.drc
 	let start     = data.start; 
 	let end       = data.end;
-	let chartType = "something_to_change_displaying_of_chart"
+	let chartType;
+	let endpoint;
 
 	for (let chartContainer of chartContainers) {
+		chartType = chartContainer.getAttribute('data-chart-type');
+		endpoint  = chartContainer.getAttribute('data-endpoint');
 		d3.select(chartContainer).select('svg').remove();
+		ChartsAPI.requestChart(endpoint, drc, start, end, draw_chart.bind(null, chartContainer, chartType));
 	}
 
-	ChartsAPI.requestChart(start, end, sources1, draw_chart.bind(null, chartContainers[0], chartType));
-	ChartsAPI.requestChart(start, end, sources2, draw_chart.bind(null, chartContainers[1], chartType));
 }
 
 
@@ -149,12 +123,15 @@ var draw_chart = function(chartContainer, chartType, data) {
 var draw_stacked_chart = function(chartContainer, data) {
 
 	// config
-	let margin = {top: 10, right: 10, bottom: 60, left: 20};
+	let margin = {top: 10, right: 10, bottom: 60, left: 40};
 	let barSpacing = 5;
 	// calculated in terms of existing container
-	let svgWidth  = parseInt(chartContainer.style.width); //chartContainer.width.baseVal.value;
-	let svgHeight = parseInt(chartContainer.style.height);
+//	let svgWidth  = parseInt(chartContainer.style.width); //chartContainer.width.baseVal.value;
+//	let svgHeight = parseInt(chartContainer.style.height);
 
+	let svgWidth  = chartContainer.offsetWidth;
+	let svgHeight = chartContainer.offsetHeight;
+	
 	let graphWidth  = svgWidth  - margin.left - margin.right;
 	let graphHeight = svgHeight - margin.top  - margin.bottom;
 

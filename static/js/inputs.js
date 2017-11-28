@@ -6,12 +6,13 @@ var HomeInputHandler = function() { this.init(); }
 
 
 HomeInputHandler.prototype.init = function(){
-    this.chartSizes      = document.getElementsByClassName('chart-size');//document.getElementById('rad_size');
-    this.selSingleSource = document.getElementById('sel_single-source');
-    this.selMultiSource  = document.getElementById('sel_multi-source');
-    this.txtStartTs      = document.getElementById('txt_startTs');
-    this.txtEndTs        = document.getElementById('txt_endTs');
-    this.btnApply        = document.getElementById('btn_apply');
+    //this.chartSizes      = document.getElementsByClassName('chart-size');//document.getElementById('rad_size');
+    //this.selSingleSource = document.getElementById('sel_single-source');
+    //this.selMultiSource  = document.getElementById('sel_multi-source');
+    this.cmbDrc         = document.getElementById('pq_drc');
+    this.txtStartTs     = document.getElementById('pq_startTs');
+    this.txtEndTs       = document.getElementById('pq_endTs');
+    this.btnApply       = document.getElementById('pq_apply');
        
     this.btnApply.addEventListener('click', this.apply.bind(this));// , capture?: boolean)
 
@@ -36,17 +37,30 @@ HomeInputHandler.prototype.get_selected_radio = function(domElems) {
 
 HomeInputHandler.prototype.apply = function()
 {
-    let size = this.get_selected_radio(this.chartSizes);
-    let singleSource = this.selSingleSource.value;
-    let multiSource = this.get_selected_options(this.selMultiSource);
+//    let size = this.get_selected_radio(this.chartSizes);
+//    let singleSource = this.selSingleSource.value;
+//    let multiSource = this.get_selected_options(this.selMultiSource);
+    let drc = this.cmbDrc.value;
     let startTs = this.txtStartTs.value;
     let endTs = this.txtEndTs.value;
-    console.log(size, singleSource, multiSource, startTs, endTs);
+    
+    console.log(drc, startTs, endTs);
 
-    let data = {size:size, single: singleSource, multi: multiSource, start: startTs, end: endTs};
+    let data = {drc: drc, start: startTs, end: endTs};
     if (this.inputChangeCallback) this.inputChangeCallback(data);
 }
 
 HomeInputHandler.prototype.defineCallBack = function(callback) {
     this.inputChangeCallback = callback;
+}
+
+HomeInputHandler.prototype.fillDRCs = function(data)
+{
+    console.log('HomeInputHandler::fillDRCs', data);
+    for (let drc of data) {
+        let opt = document.createElement('option');
+        opt.value = drc;
+        opt.innerHTML = drc;
+        this.cmbDrc.appendChild(opt);
+    }
 }
