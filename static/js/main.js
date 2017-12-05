@@ -353,10 +353,11 @@ function addPoints(data, g, xScale, yScale, color, xLegend) {
 			.attr("data-value",  function(d) { return d.value; })
 			.attr("data-legend", function(d) { return xLegend[d.x]; })
 			.attr("data-series", function(d) { return d.data_series_id; })
-			.attr("r", 4)
+			.attr("r", 2)
 			.on("mouseover", mouse_over)
         	.on("mouseout",  mouse_out)
 }
+
 
 
 var legendTimer = null;
@@ -365,15 +366,26 @@ var legendDirection = 'in'
 var fadeConfig = {in: {speed: 0.2, timeout: 0} , out: {speed: -0.05, timeout: 1000}, min: 0, max: 0.95 };
 legend.style.opacity = 0;
 
+
+
 function mouse_over() {
 	let elem = d3.select(this);
 	elem.style('fill', elem.style('stroke'));
 
 	let ev = window.event;
+	let offset = getOffsetTop(this);
+	let chartWidth = getOffsetWidth(this);
+
+console.log('screenY', ev.screenY, 'clientY', ev.clientY, 'offset', offset, chartWidth);
 
 	legend.style.display = 'block';
-	legend.style.top  = (ev.clientY + 10) + "px";
-	legend.style.left = (ev.clientX + 10) + "px";
+	legend.style.top  = (ev.clientY + window.scrollY - offset + 10) + "px";
+	
+	if (ev.clientX < chartWidth/2)
+		legend.style.left = (ev.clientX ) + "px";
+	else
+		legend.style.left = (ev.clientX - 20 - legend.offsetWidth) + "px"; // 10 padding + 10 margin
+
 	legend.innerHTML = 
 		'<div class="label">Valor</div>' +
 		'<div class="value">' + elem.attr("data-value") + ' ' + get_unit(elem.attr('data-series')) + '</div>' + 
@@ -429,6 +441,25 @@ function make_curve(data, pos) {
    		.y(function(p) { return p[1] } )
    	return curve;
 }
+
+function getOffsetTop(node) {
+	let acc = 0;
+	while (node.parentNode) {
+		if (node.offsetTop)	return node.offsetTop; 
+		node = node.parentNode;
+	}
+	return 0;
+}
+
+function getOffsetWidth(node) {
+	let acc = 0;
+	while (node.parentNode) {
+		if (node.offsetWidth) return node.offsetWidth; 
+		node = node.parentNode;
+	}
+	return 0;
+}
+
 
 function draw_axis(g, x, y, graphHeight)
 {

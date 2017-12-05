@@ -50,7 +50,7 @@ nav.tab_system li.selected a {            color: rgb(164, 155,  36);}
 
 #svg_portugal {max-width: 310; max-height: 455px;}
 
-.big-chart {max-width: 100%; height: 455px;}
+.big-chart {max-width: 100%; height: 455px; }
 
 .footer__links {margin: 5px 5px 20px 5px; font-size: 0.8em; text-align: center;}
 .footer__links a        { color: rgb(164, 155,  36); line-height: 20px;}
@@ -91,6 +91,7 @@ input.pickdate::-webkit-calendar-picker-indicator {
     opacity: 1;
 }
 
+.chart-positioner {position: relative;}
 .chart-header {overflow: hidden; display: block;}
 .parameters {float: left;}
 .global-chart-legend { background-color: #f8f8f8; border: 1px solid #222222;
