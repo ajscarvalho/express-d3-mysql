@@ -91,3 +91,23 @@ input.pickdate::-webkit-calendar-picker-indicator {
     opacity: 1;
 }
 
+.chart-header {overflow: hidden; display: block;}
+.parameters {float: left;}
+.global-chart-legend { background-color: #f8f8f8; border: 1px solid #222222;
+    margin-left: 10px; padding: 5px; max-width: 100px;
+    float: right;
+}
+
+.legend {
+    position: absolute; 
+    width: 120px; height: 65px; 
+    background: #f8f8f8; border: 1px solid #222222; 
+    z-index: 100;
+    opacity: 0;
+    display: none;
+    font-size: 12px; padding: 3px;
+}
+
+.legend .label { font-weight: bolder; color: rgb(164, 155, 36); margin-top: 5px;}
+.legend .value { margin-left: 10px;}
+

@@ -115,9 +115,12 @@ var get_series_list = function(seriesLegend) {
 }
 
 var draw_chart = function(chartContainer, chartType, data) {
-	if (chartType == 'stacked')
-		draw_stacked_chart(chartContainer, data)
-	else console.error('unknown chartType', chartType, 'for', chartContainer);
+	switch (chartType){
+		case 'stacked':	return draw_stacked_chart(chartContainer, data);
+		case 'line':	return draw_line_chart   (chartContainer, data);
+
+		default: console.error('unknown chartType', chartType, 'for', chartContainer);
+	}
 }
 
 var draw_stacked_chart = function(chartContainer, data) {
@@ -244,71 +247,242 @@ var draw_stacked_chart = function(chartContainer, data) {
 
 
 
+var draw_line_chart = function(chartContainer, data) {
 
+	// config
+	let margin = {top: 10, right: 10, bottom: 60, left: 40};
 
+	let svgWidth  = chartContainer.offsetWidth;
+	let svgHeight = chartContainer.offsetHeight;
+	
+	let graphWidth  = svgWidth  - margin.left - margin.right;
+	let graphHeight = svgHeight - margin.top  - margin.bottom;
 
-/*
-function changed() {
-  timeout.stop();
-  if (this.value === "grouped") transitionGrouped();
-  else transitionStacked();
-}
+	let seriesCardinality = dict_length(data.seriesLegend); // dict representing series Legend (The number of series).
+	let xCardinality      = data.xLegend.length;            // array with X Labels - The number of values per series.
+	
+	let xSpacing = Math.floor(graphWidth / xCardinality);
 
-function transitionGrouped() {
-  y.domain([0, yMax]);
+	let seriesList = get_series_list(data.seriesLegend);
+	console.log("seriesList", seriesList);
 
-  rect.transition()
-	  .duration(500)
-	  .delay(function(d, i) { return i * 10; })
-	  .attr("x", function(d, i) { return x(i) + x.bandwidth() / n * this.parentNode.__data__.key; })
-	  .attr("width", x.bandwidth() / n)
-	.transition()
-	  .attr("y", function(d) { return y(d[1] - d[0]); })
-	  .attr("height", function(d) { return y(0) - y(d[1] - d[0]); });
-}
-
-function transitionStacked() {
-  y.domain([0, y1Max]);
-
-  rect.transition()
-	  .duration(500)
-	  .delay(function(d, i) { return i * 10; })
-	  .attr("y", function(d) { return y(d[1]); })
-	  .attr("height", function(d) { return y(d[0]) - y(d[1]); })
-	.transition()
-	  .attr("x", function(d, i) { return x(i); })
-	  .attr("width", x.bandwidth());
-}
-
-// Returns an array of m psuedorandom, smoothly-varying non-negative numbers.
-// Inspired by Lee Byron’s test data generator.
-// http://leebyron.com/streamgraph/
-function bumps(m) {
-  var values = [], i, j, w, x, y, z;
-
-  // Initialize with uniform random values in [0.1, 0.2).
-  for (i = 0; i < m; ++i) {
-	values[i] = 0.1 + 0.1 * Math.random();
-  }
-
-  // Add five random bumps.
-  for (j = 0; j < 5; ++j) {
-	x = 1 / (0.1 + Math.random());
-	y = 2 * Math.random() - 0.5;
-	z = 10 / (0.1 + Math.random());
-	for (i = 0; i < m; i++) {
-	  w = (i / m - y) * z;
-	  values[i] += x * Math.exp(-w * w);
+	let xz = d3.range(xCardinality),
+		yz = d3.range(seriesCardinality).map(function() { return d3.range(xCardinality) });
+	
+	for (let pt of data.points) {
+		let s = seriesList.d[pt.data_series_id];
+		yz[s.pos][pt.x] = pt.value;
 	}
-  }
 
-  // Ensure all values are positive.
-  for (i = 0; i < m; ++i) {
-	values[i] = Math.max(0, values[i]);
-  }
+	let svg = d3.select(chartContainer).append("svg")
+		.attr("width", svgWidth).attr("height", svgHeight);
 
-  return values;
+	let g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	// [series => [y0, y1, ... yn]]
+	let y01z = []
+	for (let d of data.points) {
+		if (!y01z[d.data_series_id]) y01z[d.data_series_id] = []
+		y01z[d.data_series_id][d.x] = [d.x , d.value]; // * xSpacing
+	}
+
+	let y1Max = d3.max(data.points, function(d) { return d.value; }) * 1.05; // 5% margin
+
+	// axis
+	let xScale = d3.scaleLinear()
+		.domain( [-1, xCardinality] ) // -1
+		.range( [0, graphWidth] );
+
+	let yScale = d3.scaleLinear()
+		.domain([0, y1Max])
+		.range([graphHeight, 0]);
+
+	// set color scheme
+	let colorScheme = function(s) { return s ? '#ff0000' : '#0000ff'; };
+
+	//console.log("colorScheme", colorScheme(0), colorScheme(1));
+
+	var yAxis = make_y_axis(yScale, 10); // add tickFunction?
+	var xAxis = make_x_axis(xScale, data.xLegend); // add tickFunction?
+
+	draw_axis(g, xAxis, yAxis, graphHeight);
+
+
+//	var series = g.append('g').attr('class', 'series');
+
+//*
+	var series = g.selectAll(".series")
+		.data(y01z)
+		.enter().append("g").attr('fill', 'none')
+//*/
+
+	var curve = d3.line()
+   		.curve(d3.curveCardinal)
+   		.x(function(p) { return xScale(p[0]); } )
+   		.y(function(p) { return yScale(p[1]); } )
+
+
+	var path = series.selectAll("path")
+	  	.data(function(x,y) { return [{points: x, seriesId: y}]; })
+	  	.enter()
+	  	.append("path")
+			.style("stroke", function(data) {
+				return colorScheme(data.seriesId);
+			}).datum( function(x,y) { return x.points; })
+			.attr("d", curve)
+			.enter();
+
+	addPoints(data.points, g, xScale, yScale, colorScheme, data.xLegend)
+
+	return;
 }
 
-*/
+
+function addPoints(data, g, xScale, yScale, color, xLegend) {
+
+	g.selectAll("data-point")
+		.data(data)
+		.enter()
+		.append("svg:circle")
+			.attr("class", "data-point")
+			.style("opacity", 1)
+			.style("stroke", function(d) { return color(d.data_series_id); })
+			.style("fill", function(d) { return '#eeeeee'; }) // color(d.data_series_id);  })
+			.attr("cx", function(d) { return xScale(d.x); })
+			.attr("cy", function(d) { return yScale(d.value); })
+			.attr("data-value",  function(d) { return d.value; })
+			.attr("data-legend", function(d) { return xLegend[d.x]; })
+			.attr("data-series", function(d) { return d.data_series_id; })
+			.attr("r", 4)
+			.on("mouseover", mouse_over)
+        	.on("mouseout",  mouse_out)
+}
+
+
+var legendTimer = null;
+var legend = document.getElementById('chartLegend')
+var legendDirection = 'in'
+var fadeConfig = {in: {speed: 0.2, timeout: 0} , out: {speed: -0.05, timeout: 1000}, min: 0, max: 0.95 };
+legend.style.opacity = 0;
+
+function mouse_over() {
+	let elem = d3.select(this);
+	elem.style('fill', elem.style('stroke'));
+
+	let ev = window.event;
+
+	legend.style.display = 'block';
+	legend.style.top  = (ev.clientY + 10) + "px";
+	legend.style.left = (ev.clientX + 10) + "px";
+	legend.innerHTML = 
+		'<div class="label">Valor</div>' +
+		'<div class="value">' + elem.attr("data-value") + ' ' + get_unit(elem.attr('data-series')) + '</div>' + 
+		'<div class="label">Data</div>' + 
+		'<div class="value">' + elem.attr("data-legend") + '</div>';
+
+	legendDirection = 'in'
+	legendTimer = setTimeout(legend_fader, fadeConfig[legendDirection].timeout);
+}
+
+function get_unit(seriesId) {
+	switch(seriesId) {
+		case '0': return 'MW';
+		case '1': return 'MVAr';
+	}
+	return '';
+}
+
+function mouse_out(){
+	let elem = d3.select(this);
+	elem.style('fill', '#eeeeee');
+	legendDirection = 'out'
+	legendTimer = setTimeout(legend_fader, fadeConfig[legendDirection].timeout);
+}
+
+
+
+function legend_fader(){
+	let cfg = fadeConfig[legendDirection]
+	let nextVal = parseFloat(legend.style.opacity) + cfg.speed;
+
+	if (nextVal > fadeConfig.max) { 
+		legend.style.opacity = fadeConfig.max;
+		return;
+	}
+
+	if (nextVal < fadeConfig.min) {
+		legend.style.opacity = fadeConfig.min;
+		legend.style.display = 'none';
+		return;
+	}
+
+	legend.style.opacity = nextVal;
+
+	requestAnimationFrame(legend_fader);
+}
+
+
+function make_curve(data, pos) {
+	var curve = d3.line()
+   		.curve(d3.curveCardinalOpen)
+   		.x(function(p) { return p[0]; } )
+   		.y(function(p) { return p[1] } )
+   	return curve;
+}
+
+function draw_axis(g, x, y, graphHeight)
+{
+	// add x-axis.
+    
+	g.append("g")
+        .attr("class", "axis axis--x")
+		.attr("transform", "translate(0," + graphHeight + ")")
+		.call(x)
+		.selectAll("text")
+      		.call(date_legend_break)
+			.attr("transform", "rotate(-90)")
+			.attr("x", 9)
+			
+//        .attr("transform", "translate(" + barWidth/2 + ", 100); rotate(-90)");
+
+	// Add y-axis.
+	g.append("g")
+		.attr("class", "axis axis--y")
+		.call(y)
+	.selectAll("g")
+		.filter(function(value) { return value != '0M'; } )
+		.classed("zero", true);
+}
+
+function date_legend_break(text)
+{
+	text.each(function() {
+		let lineHeight = 1.1; // ems
+		let xOffset = -30;
+		let text = d3.select(this);
+        let words = text.text().split(' ');
+        console.log("break", words);
+		let y = -10;
+        let dy = parseFloat(text.attr("dy"));
+		let tspan = text.text(null).append("tspan").attr("x", xOffset).attr("y", y).attr("dy", dy + "em");
+		tspan.text(words[0]); // add date
+		tspan = text.append("tspan").attr("x", xOffset).attr("y", y).attr("dy", lineHeight + dy + "em").text(words[1]);
+	})
+}
+
+
+function make_x_axis(scale, legend) {
+	return d3.axisBottom().scale(scale)
+		.tickSize(1)
+		.tickFormat(function(d) { if (legend[d]) return legend[d]; })
+}
+
+function make_y_axis(scale, ticks, tickFormat) {
+    return d3.axisLeft()
+		.scale(scale)
+		.tickSize(1)
+		.ticks(ticks)
+		.tickFormat(tickFormat);
+}
+
 setTimeout(main, 0); // schedule function to be run as soon as possible
