@@ -55,3 +55,39 @@ nav.tab_system li.selected a {            color: rgb(164, 155,  36);}
 .footer__links {margin: 5px 5px 20px 5px; font-size: 0.8em; text-align: center;}
 .footer__links a        { color: rgb(164, 155,  36); line-height: 20px;}
 .footer__links a:hover  { color: rgb( 19,  48,  53); }
+
+
+
+
+
+/** date styling */
+#chart_container label {min-width: 120px; display: inline-block;}
+
+input.pickdate {
+    position: relative;
+    width: 150px; height: 20px;
+    color: white;
+    vertical-align: middle;
+    margin: 5px 0;
+}
+
+input.pickdate:before {
+    position: absolute;
+    top: 3px; left: 3px;
+    content: attr(data-date);
+    display: inline-block;
+    color: black;
+}
+
+input.pickdate::-webkit-datetime-edit, input.pickdate::-webkit-inner-spin-button, input.pickdate::-webkit-clear-button {
+    display: none;
+}
+
+input.pickdate::-webkit-calendar-picker-indicator {
+    position: absolute;
+    top: 3px;
+    right: 0;
+    color: black;
+    opacity: 1;
+}
+

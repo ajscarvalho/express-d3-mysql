@@ -10,14 +10,29 @@ HomeInputHandler.prototype.init = function(){
     //this.selSingleSource = document.getElementById('sel_single-source');
     //this.selMultiSource  = document.getElementById('sel_multi-source');
     this.cmbDrc         = document.getElementById('pq_drc');
-    this.txtStartTs     = document.getElementById('pq_startTs');
-    this.txtEndTs       = document.getElementById('pq_endTs');
+    this.txtStartDate   = document.getElementById('pq_startDate');
+    this.txtStartTime   = document.getElementById('pq_startTime');
+    this.txtEndDate     = document.getElementById('pq_endDate');
+    this.txtEndTime     = document.getElementById('pq_endTime');
     this.btnApply       = document.getElementById('pq_apply');
-       
+
+    this.txtStartDate.addEventListener("change", this.dateFormat.bind(this, this.txtStartDate));
+    this.txtEndDate  .addEventListener("change", this.dateFormat.bind(this, this.txtEndDate));
+
     this.btnApply.addEventListener('click', this.apply.bind(this));// , capture?: boolean)
 
     this.inputChangeCallback = null;
+    this.dateFormat(this.txtStartDate);
+    this.dateFormat(this.txtEndDate);
 }
+
+HomeInputHandler.prototype.dateFormat = function(domInput) {
+    console.log('date', domInput, domInput.value);
+    domInput.setAttribute(
+        "data-date",
+        domInput.value // just use the YYYY-MM-DD format
+    );
+};
 
 HomeInputHandler.prototype.get_selected_options = function(domElem) {
     var selectedOptions = [];
@@ -41,10 +56,16 @@ HomeInputHandler.prototype.apply = function()
 //    let singleSource = this.selSingleSource.value;
 //    let multiSource = this.get_selected_options(this.selMultiSource);
     let drc = this.cmbDrc.value;
-    let startTs = this.txtStartTs.value;
-    let endTs = this.txtEndTs.value;
+    let startDate = this.txtStartDate.value;
+    let startTime = this.txtStartTime.value;
+    let endDate   = this.txtEndDate.value;
+    let endTime   = this.txtEndTime.value;
     
-    console.log(drc, startTs, endTs);
+    console.log(drc, startDate, startTime, endDate, endTime);
+
+    let startTs = startDate + ' ' + startTime;
+    let   endTs =   endDate + ' ' +   endTime;
+
 
     let data = {drc: drc, start: startTs, end: endTs};
     if (this.inputChangeCallback) this.inputChangeCallback(data);

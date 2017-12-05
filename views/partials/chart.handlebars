@@ -7,12 +7,17 @@
         </select>
     </li>
     <li>
-        <label for="pq_startTs">Start Timestamp</label>
-        <input type="text" id="pq_startTs" name="pq_startTs" value="2017-11-01 00:00:00" />
+        <label for="pq_startDate">Start Timestamp</label>
+
+        <!--<input type="text" id="pq_startTs" name="pq_startTs" value="2017-11-01 00:00:00" />-->
+        <input type="date" class="pickdate" id="pq_startDate" name="pq_startDate" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" value="2017-11-01">
+        <input type="time" class="picktime" id="pq_startTime" name="pq_startTime" value="00:00" step="300">
     </li>
     <li>
-        <label for="pq_endTs">End Timestamp</label>
-        <input type="text" id="pq_endTs" name="pq_endTs" value="2017-11-30 00:00:00" />
+        <label for="pq_endDate">End Timestamp</label>
+        <!--<input type="text" id="pq_endTs" name="pq_endTs" value="2017-11-30 00:00:00" />-->
+        <input type="date" class="pickdate" id="pq_endDate" name="pq_endDate" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" value="2017-11-30">
+        <input type="time" class="picktime" id="pq_endTime" name="pq_endTime" value="00:00" step="300">
     </li>
     <li>
         <input type="button" id="pq_apply" value="Apply!">
